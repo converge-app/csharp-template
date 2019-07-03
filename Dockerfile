@@ -17,4 +17,4 @@ RUN dotnet publish "Account.csproj" -c Release -o /app
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app .
-ENTRYPOINT ["dotnet", "Account.dll"]
+ENTRYPOINT ["dotnet", "Account.dll", "--server.urls", "http://localhost:5000"]

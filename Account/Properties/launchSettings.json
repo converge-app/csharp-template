@@ -29,7 +29,10 @@
     "Docker": {
       "commandName": "Docker",
       "launchBrowser": true,
-      "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}/api/health/ping"
+      "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}/api/health/ping",
+      "environmentVariables": {
+        "ASPNETCORE_URLS": "http://localhost:5000"
+      }
     }
   }
 }
