@@ -54,7 +54,7 @@
     <option name="x" value="3851" />
     <option name="y" value="64" />
     <option name="width" value="1872" />
-    <option name="height" value="2059" />
+    <option name="height" value="1030" />
   </component>
   <component name="ProjectView">
     <navigator currentView="SolutionExplorer" proportions="" version="1">
@@ -88,6 +88,7 @@
     </panes>
   </component>
   <component name="PropertiesComponent">
+    <property name="ASKED_SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="Rider.DefaultBreakpoints.AreToggled" value="true" />
     <property name="Rider.ProjectViewActivator.IsNotFirstRun" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
@@ -149,12 +150,12 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1562179955316</updated>
-      <workItem from="1562179959819" duration="88000" />
+      <workItem from="1562179959819" duration="374000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="88000" />
+    <option name="totallyTimeSpent" value="374000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -166,7 +167,7 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="3851" y="64" width="1872" height="2059" extended-state="0" />
+    <frame x="3851" y="64" width="1872" height="1030" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Favorites" side_tool="true" />
