@@ -1,7 +1,4 @@
-﻿using Account.Database;
-using Account.Repositories;
-using Account.Services;
-using Account.Utility;
+﻿using Application.Utility;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -9,7 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 
-namespace Account
+namespace Application
 {
     public class Startup
     {
@@ -31,13 +28,6 @@ namespace Account
                 });
             APIDocumentationInitializer.ApiDocumentationInitializer(services);
             StartupDatabaseInitializer.InitializeDatabase(services);
-
-            services.AddScoped<IAccountRepository, AccountRepository>();
-            services.AddScoped<IUnitOfWork, UnitOfWork>();
-            services.AddScoped<ITransactionsRepository, TransactionsRepository>();
-
-            services.AddScoped<IAccountService, AccountService>();
-            services.AddScoped<ITransactionsService, TransactionsService>();
 
             CorsConfig.AddCorsPolicy(services);
         }

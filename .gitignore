@@ -12,6 +12,7 @@
 
 # Account-specific files (MonoDevelop/Xamarin Studio)
 *.accountprefs
+.idea
 
 # Build results
 [Dd]ebug/
