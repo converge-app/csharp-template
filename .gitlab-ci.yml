@@ -79,7 +79,8 @@ test:
   script:
     - dotnet add ApplicationUnitTests/ApplicationUnitTests.csproj package coverlet.msbuild
     - dotnet tool install --global dotnet-sonarscanner
-    - token="$(SONARCLOUD_TOKEN)"
+    - export PATH="$PATH:/root/.dotnet/tools"
+    - token="$SONARCLOUD_TOKEN"
     - dir="$(pwd)"
     - dotnet sonarscanner begin /k:"converge:converge-app" /n:"Converge-app" /v:"#.#.#" /o:"converge" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.login="${token}" /d:sonar.language="cs" /d:sonar.exclusions="**/bin/**/*,**/obj/**/*" /d:sonar.cs.opencover.reportsPaths="${dir}/lcov.opencover.xml"
     - dotnet restore
