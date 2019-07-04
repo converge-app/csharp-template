@@ -77,7 +77,7 @@ test:
   stage: test
   image: microsoft/dotnet:2.2-sdk
   script:
-    - dotnet add package coverlet.msbuild
+    - dotnet add ApplicationUnitTests/ApplicationUnitTests.csproj package coverlet.msbuild
     - dotnet build
     - dotnet test ApplicationUnitTests/ApplicationUnitTests.csproj /p:CollectCoverage=true
 
