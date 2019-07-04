@@ -1,7 +1,7 @@
 {
   "iisSettings": {
-    "windowsAccount": false,
-    "anonymousAccount": true,
+    "windowsApplication": false,
+    "anonymousApplication": true,
     "iisExpress": {
       "applicationUrl": "http://localhost:54327",
       "sslPort": 44301
@@ -17,7 +17,7 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
-    "PSO_Control_Service": {
+    "Application": {
       "commandName": "Project",
       "launchBrowser": true,
       "launchUrl": "api/health/ping",
