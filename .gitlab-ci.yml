@@ -77,9 +77,15 @@ test:
   stage: test
   image: microsoft/dotnet:2.2-sdk
   script:
-    - dotnet add package coverlet.msbuild
+    - dotnet add ApplicationUnitTests/ApplicationUnitTests.csproj package coverlet.msbuild
+    - dotnet tool install dotnet-sonarscanner
+    - token="$(SONARCLOUD_TOKEN)"
+    - dir="$(pwd)"
+    - dotnet sonarscanner begin /k:"converge:converge-app" /n:"Converge-app" /v:"#.#.#" /o:"converge" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.login="${token}" /d:sonar.language="cs" /d:sonar.exclusions="**/bin/**/*,**/obj/**/*" /d:sonar.cs.opencover.reportsPaths="${dir}/lcov.opencover.xml"
+    - dotnet restore
     - dotnet build
-    - dotnet test ApplicationUnitTests/ApplicationUnitTests.csproj /p:CollectCoverage=true
+    - dotnet test ApplicationUnitTests/ApplicationUnitTests.csproj /p:CollectCoverage=true /p:CoverletOutputFormat=\"opencover,lcov\" /p:CoverletOutput=../lcov
+    - dotnet sonarscanner end /d:sonar.login="${token}"
 
 include:
   - template: Jobs/Build.gitlab-ci.yml # https://gitlab.com/gitlab-org/gitlab-ce/blob/master/lib/gitlab/ci/templates/Jobs/Build.gitlab-ci.yml
