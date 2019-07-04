@@ -77,8 +77,9 @@ test:
   stage: test
   image: microsoft/dotnet:2.2-sdk
   script:
+    - dotnet add package coverlet.msbuild
     - dotnet build
-    - dotnet test ApplicationUnitTests/ApplicationUnitTests.csproj
+    - dotnet test ApplicationUnitTests/ApplicationUnitTests.csproj /p:CollectCoverage=true
 
 include:
   - template: Jobs/Build.gitlab-ci.yml # https://gitlab.com/gitlab-org/gitlab-ce/blob/master/lib/gitlab/ci/templates/Jobs/Build.gitlab-ci.yml
