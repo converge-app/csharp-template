@@ -59,8 +59,8 @@ variables:
 
 stages:
   - build
-#  - test
-  - deploy  # dummy stage to follow the template guidelines
+  - test
+  - deploy # dummy stage to follow the template guidelines
   - review
   - dast
   - staging
@@ -70,13 +70,18 @@ stages:
   - incremental rollout 25%
   - incremental rollout 50%
   - incremental rollout 100%
-#  - performance
+  #  - performance
   - cleanup
+
+test:
+  script:
+    - dotnet build
+    - dotnet test ApplicationUnitTests/ApplicationUnitTests.csproj
 
 include:
   - template: Jobs/Build.gitlab-ci.yml # https://gitlab.com/gitlab-org/gitlab-ce/blob/master/lib/gitlab/ci/templates/Jobs/Build.gitlab-ci.yml
-#  - template: Jobs/Test.gitlab-ci.yml # https://gitlab.com/gitlab-org/gitlab-ce/blob/master/lib/gitlab/ci/templates/Jobs/Test.gitlab-ci.yml
-#  - template: Jobs/Code-Quality.gitlab-ci.yml # https://gitlab.com/gitlab-org/gitlab-ce/blob/master/lib/gitlab/ci/templates/Jobs/Code-Quality.gitlab-ci.yml
+  #  - template: Jobs/Test.gitlab-ci.yml # https://gitlab.com/gitlab-org/gitlab-ce/blob/master/lib/gitlab/ci/templates/Jobs/Test.gitlab-ci.yml
+  #  - template: Jobs/Code-Quality.gitlab-ci.yml # https://gitlab.com/gitlab-org/gitlab-ce/blob/master/lib/gitlab/ci/templates/Jobs/Code-Quality.gitlab-ci.yml
   - template: Jobs/Deploy.gitlab-ci.yml # https://gitlab.com/gitlab-org/gitlab-ce/blob/master/lib/gitlab/ci/templates/Jobs/Deploy.gitlab-ci.yml
 #  - template: Jobs/Browser-Performance-Testing.gitlab-ci.yml # https://gitlab.com/gitlab-org/gitlab-ce/blob/master/lib/gitlab/ci/templates/Jobs/Browser-Performance-Testing.gitlab-ci.yml
 #  - template: Security/DAST.gitlab-ci.yml # https://gitlab.com/gitlab-org/gitlab-ce/blob/master/lib/gitlab/ci/templates/Security/DAST.gitlab-ci.yml
