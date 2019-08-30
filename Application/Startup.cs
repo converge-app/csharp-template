@@ -8,11 +8,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using Prometheus;
 using OpenTracing;
 using OpenTracing.Util;
+using Prometheus;
 
 namespace Application
 {
@@ -45,9 +44,9 @@ namespace Application
                 ISampler sampler = new ConstSampler(sample: true);
 
                 ITracer tracer = new Tracer.Builder(serviceName)
-                .WithLoggerFactory(loggerFactory)
-                .WithSampler(sampler)
-                .Build();
+                    .WithLoggerFactory(loggerFactory)
+                    .WithSampler(sampler)
+                    .Build();
 
                 GlobalTracer.Register(tracer);
 
