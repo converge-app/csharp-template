@@ -9,7 +9,7 @@ namespace Application.Controllers
         [HttpGet("ping")]
         public ActionResult<string> Ping()
         {
-            return Ok("{\"message\": \"pong!\"}");
+            return Ok(new { Message = "pong!" });
         }
     }
 }

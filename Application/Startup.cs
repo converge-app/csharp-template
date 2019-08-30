@@ -10,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using Prometheus;
 using OpenTracing;
 using OpenTracing.Util;
 
@@ -72,6 +73,9 @@ namespace Application
                 app.UseHsts();
                 app.UseHttpsRedirection();
             }
+
+            app.UseMetricServer();
+            app.UseRequestMiddleware();
 
             StartupDatabaseInitializer.MigrateDatabase(app);
             APIDocumentationInitializer.AllowAPIDocumentation(app);
