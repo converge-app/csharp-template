@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
+using Prometheus;
 
 namespace Application
 {
@@ -45,6 +46,9 @@ namespace Application
                 app.UseHsts();
                 app.UseHttpsRedirection();
             }
+
+            app.UseMetricServer();
+            app.UseRequestMiddleware();
 
             StartupDatabaseInitializer.MigrateDatabase(app);
             APIDocumentationInitializer.AllowAPIDocumentation(app);
