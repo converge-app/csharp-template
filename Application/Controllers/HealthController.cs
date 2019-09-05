@@ -6,10 +6,12 @@ namespace Application.Controllers
     public class HealthController : Controller
     {
         // GET api/health/ping
+        [Produces("application/json")]
         [HttpGet("ping")]
-        public ActionResult<string> Ping()
+        public ActionResult Ping()
         {
-            return Ok("{\"message\": \"pong!\"}");
+            System.Console.WriteLine(Request.HttpContext);
+            return Json(new { Message = "pong!" });
         }
     }
 }

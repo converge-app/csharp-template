@@ -1,83 +1,118 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Reflection;
 using Application.Utility;
-using Jaeger;
-using Jaeger.Samplers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using OpenTracing;
 using OpenTracing.Util;
+using Serilog;
+using Serilog.Events;
+using Serilog.Sinks.Elasticsearch;
 
-namespace Application
-{
-    public class Startup
-    {
-        public Startup(IConfiguration configuration)
-        {
+namespace Application {
+    public class StartupDevelopment {
+        public StartupDevelopment (IConfiguration configuration) {
+
+            Environment.SetEnvironmentVariable ("ELASTICSEARCH_URI", "http://localhost:9200");
+            _startup = new Startup (configuration);
+        }
+
+        private Startup _startup;
+        public void ConfigureServices (IServiceCollection services) {
+            _startup.ConfigureServices (services);
+        }
+
+        public void Configure (IApplicationBuilder app, IHostingEnvironment env) {
+            _startup.Configure (app, env);
+        }
+    }
+
+    public class Startup {
+        public Startup (IConfiguration configuration) {
             Configuration = configuration;
+            CreateLogger ();
+        }
+
+        public void CreateLogger () {
+            try {
+                Log.Logger = new LoggerConfiguration ()
+                    .Enrich.FromLogContext ()
+                    .MinimumLevel.Debug ()
+                    .WriteTo.Elasticsearch (new ElasticsearchSinkOptions (new Uri (Environment.GetEnvironmentVariable ("ELASTICSEARCH_URI"))) {
+                        MinimumLogEventLevel = LogEventLevel.Verbose,
+                            AutoRegisterTemplate = true
+                    }).CreateLogger ();
+            } catch (System.Exception e) {
+                System.Console.WriteLine (e);
+                throw e;
+            }
         }
 
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services)
-        {
+        public void ConfigureServices (IServiceCollection services) {
             // Set compability mode for mvc
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
-                .AddJsonOptions(options =>
-                {
+            services.AddMvc ().SetCompatibilityVersion (CompatibilityVersion.Version_2_2)
+                .AddJsonOptions (options => {
                     options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
                 });
-            services.AddSingleton<ITracer>(serviceProvider =>
-            {
-                string serviceName = Assembly.GetEntryAssembly().GetName().Name;
+            services.AddSingleton<ITracer> (serviceProvider => {
+                string serviceName = Assembly.GetEntryAssembly ().GetName ().Name;
 
-                ILoggerFactory loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
+                Environment.SetEnvironmentVariable ("JAEGER_SERVICE_NAME", serviceName);
+
+                var loggerFactory = new LoggerFactory ();
 
                 // add agenthost and port
+                var config = Jaeger.Configuration.FromEnv (loggerFactory);
+                var tracer = config.GetTracer ();
 
-                ISampler sampler = new ConstSampler(sample: true);
-
-                ITracer tracer = new Tracer.Builder(serviceName)
-                .WithLoggerFactory(loggerFactory)
-                .WithSampler(sampler)
-                .Build();
-
-                GlobalTracer.Register(tracer);
+                GlobalTracer.Register (tracer);
 
                 return tracer;
             });
-            services.AddOpenTracing();
-            APIDocumentationInitializer.ApiDocumentationInitializer(services);
-            StartupDatabaseInitializer.InitializeDatabase(services);
 
-            CorsConfig.AddCorsPolicy(services);
+            services.AddLogging (loggingBuilder => loggingBuilder.AddSerilog (dispose: true));
+            services.AddOpenTracing ();
+
+            APIDocumentationInitializer.ApiDocumentationInitializer (services);
+            StartupDatabaseInitializer.InitializeDatabase (services);
+
+            services.AddHealthChecks ();
+
+            CorsConfig.AddCorsPolicy (services);
+        }
+
+        public void ConfigureDevelopmentSevices (IServiceCollection services) {
+            Environment.SetEnvironmentVariable ("JAEGER_AGENT_HOST", "localhost");
+            Environment.SetEnvironmentVariable ("JAEGER_AGENT_PORT", "6831");
+            Environment.SetEnvironmentVariable ("JAEGER_SAMPLER_TYPE", "const");
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
-        {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
-            else
-            {
+        public void Configure (IApplicationBuilder app, IHostingEnvironment env) {
+
+            if (env.IsDevelopment ()) {
+                app.UseDeveloperExceptionPage ();
+            } else {
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-                app.UseHsts();
-                app.UseHttpsRedirection();
+                app.UseHsts ();
+                app.UseHttpsRedirection ();
             }
 
-            StartupDatabaseInitializer.MigrateDatabase(app);
-            APIDocumentationInitializer.AllowAPIDocumentation(app);
-            CorsConfig.AddCors(app);
+            app.UseHealthChecks ("/api/health");
 
-            app.UseMvc();
+            StartupDatabaseInitializer.MigrateDatabase (app);
+            APIDocumentationInitializer.AllowAPIDocumentation (app);
+            CorsConfig.AddCors (app);
+
+            app.UseMvc ();
         }
     }
 }
