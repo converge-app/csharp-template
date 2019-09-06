@@ -13,6 +13,7 @@ using OpenTracing.Util;
 using Serilog;
 using Serilog.Events;
 using Serilog.Sinks.Elasticsearch;
+using Prometheus;
 
 namespace Application
 {
@@ -69,7 +70,6 @@ namespace Application
                     var tracer = config.GetTracer();
 
                     GlobalTracer.Register(tracer);
-
                     return tracer;
                 }
                 catch (System.Exception)
@@ -114,6 +114,8 @@ namespace Application
             }
 
             app.UseHealthChecks("/api/health");
+            app.UseMetricServer();
+            app.UseRequestMiddleware();
 
             StartupDatabaseInitializer.MigrateDatabase(app);
             APIDocumentationInitializer.AllowAPIDocumentation(app);

@@ -10,8 +10,7 @@ namespace Application.Controllers
         [HttpGet("ping")]
         public ActionResult Ping()
         {
-            System.Console.WriteLine(Request.HttpContext);
-            return Json(new { Message = "pong!" });
+            return Ok(new { Message = "pong!" });
         }
     }
 }
