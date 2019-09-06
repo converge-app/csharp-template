@@ -6,8 +6,9 @@ namespace Application.Controllers
     public class HealthController : Controller
     {
         // GET api/health/ping
+        [Produces("application/json")]
         [HttpGet("ping")]
-        public ActionResult<string> Ping()
+        public ActionResult Ping()
         {
             return Ok(new { Message = "pong!" });
         }
