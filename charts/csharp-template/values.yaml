@@ -41,3 +41,6 @@ readinessProbe:
 code-db:
   replicaSet:
     enabled: true
+env:
+  - name: ELASTICSEARCH_URI
+    value: "something"
