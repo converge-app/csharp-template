@@ -16,7 +16,7 @@ knativeDeploy: false
 service:
   name: csharp-template
   type: ClusterIP
-  externalPort: 5000
+  externalPort: 80
   internalPort: 80
   annotations:
     fabric8.io/expose: "true"
@@ -42,5 +42,7 @@ code-db:
   replicaSet:
     enabled: true
 env:
+  - name: ASPNETCORE_ENVIRONMENT
+    value: Production
   - name: ELASTICSEARCH_URI
-    value: "something"
+    value: ""
