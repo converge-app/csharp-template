@@ -28,9 +28,10 @@ spec:
         - name: {{ $pkey }}
           value: {{ quote $pval }}
 {{- end }}
-        env:
         - name: DB
           value: {{ template "fullname" . }}-db
+        - name: ASPNETCORE_ENVIRONMENT
+          value: production
         ports:
         - containerPort: {{ .Values.service.internalPort }}
         resources:

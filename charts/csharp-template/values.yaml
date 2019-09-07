@@ -16,10 +16,10 @@ knativeDeploy: false
 service:
   name: csharp-template
   type: ClusterIP
-  externalPort: 5000
+  externalPort: 80
   internalPort: 80
   annotations:
-    fabric8.io/expose: "true"
+    fabric8.io/expose: "false"
     fabric8.io/ingress.annotations: "kubernetes.io/ingress.class: nginx"
 resources:
   limits:
@@ -28,7 +28,7 @@ resources:
   requests:
     cpu: 250m
     memory: 256Mi
-probePath: /api/health/ping
+probePath: /
 livenessProbe:
   initialDelaySeconds: 60
   periodSeconds: 10
