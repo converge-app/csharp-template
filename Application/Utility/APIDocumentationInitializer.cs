@@ -8,7 +8,10 @@ namespace Application.Utility
     {
         public static void ApiDocumentationInitializer(IServiceCollection services)
         {
-            services.AddSwaggerGen(c => { c.SwaggerDoc("Application", new Info { Title = "Application API", Version = "v1" }); });
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("Application", new Info {Title = "Application API", Version = "v1"});
+            });
         }
 
         public static void AllowAPIDocumentation(IApplicationBuilder app)
