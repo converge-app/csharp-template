@@ -10,12 +10,12 @@ namespace Application
     {
         public StartupDevelopment(IConfiguration configuration)
         {
-
             Environment.SetEnvironmentVariable("ELASTICSEARCH_URI", "http://localhost:9200");
             _startup = new Startup(configuration);
         }
 
         private Startup _startup;
+
         public void ConfigureServices(IServiceCollection services)
         {
             _startup.ConfigureServices(services);

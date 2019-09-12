@@ -1,23 +1,25 @@
 ﻿using System;
 using System.Reflection;
+using System.Text;
 using Application.Utility;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using OpenTracing;
 using OpenTracing.Util;
+using Prometheus;
 using Serilog;
 using Serilog.Events;
 using Serilog.Sinks.Elasticsearch;
-using Prometheus;
 
 namespace Application
 {
-
     public class Startup
     {
         public Startup(IConfiguration configuration)
@@ -33,15 +35,16 @@ namespace Application
                 Log.Logger = new LoggerConfiguration()
                     .Enrich.FromLogContext()
                     .MinimumLevel.Debug()
-                    .WriteTo.Elasticsearch(new ElasticsearchSinkOptions(new Uri(Environment.GetEnvironmentVariable("ELASTICSEARCH_URI")))
-                    {
-                        MinimumLogEventLevel = LogEventLevel.Verbose,
-                        AutoRegisterTemplate = true
-                    }).CreateLogger();
+                    .WriteTo.Elasticsearch(
+                        new ElasticsearchSinkOptions(new Uri(Environment.GetEnvironmentVariable("ELASTICSEARCH_URI")))
+                        {
+                            MinimumLogEventLevel = LogEventLevel.Verbose,
+                            AutoRegisterTemplate = true
+                        }).CreateLogger();
             }
-            catch (System.Exception e)
+            catch (Exception e)
             {
-                System.Console.WriteLine(e);
+                Console.WriteLine(e);
             }
         }
 
@@ -58,9 +61,9 @@ namespace Application
                 });
             services.AddSingleton<ITracer>(serviceProvider =>
             {
-                string serviceName = Assembly.GetEntryAssembly().GetName().Name;
+                var serviceName = Assembly.GetEntryAssembly().GetName().Name;
 
-                Environment.SetEnvironmentVariable("JAEGER_SERVICE_NAME", serviceName);
+                Environment.SetEnvironmentVariable("JAEGER_SERVICE_NAME", serviceName + "-http");
 
                 var loggerFactory = new LoggerFactory();
                 try
@@ -72,16 +75,33 @@ namespace Application
                     GlobalTracer.Register(tracer);
                     return tracer;
                 }
-                catch (System.Exception)
+                catch (Exception)
                 {
-                    System.Console.WriteLine("Couldn't register logger");
+                    Console.WriteLine("Couldn't register logger");
                 }
+
                 return null;
-
             });
-
-            services.AddLogging(loggingBuilder => loggingBuilder.AddSerilog(dispose: true));
+            services.AddHttpClient();
+            //services.AddLogging (loggingBuilder => loggingBuilder.AddSerilog (dispose: true));
             services.AddOpenTracing();
+
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters()
+                {
+                    ValidateIssuer = false,
+                    ValidateAudience = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidAudience = "auth",
+                    IssuerSigningKey =
+                        new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["AppSettings:Secret"]))
+                };
+            });
 
             APIDocumentationInitializer.ApiDocumentationInitializer(services);
             StartupDatabaseInitializer.InitializeDatabase(services);
@@ -101,7 +121,6 @@ namespace Application
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -116,6 +135,8 @@ namespace Application
             app.UseHealthChecks("/api/health");
             app.UseMetricServer();
             app.UseRequestMiddleware();
+
+            app.UseAuthentication();
 
             StartupDatabaseInitializer.MigrateDatabase(app);
             APIDocumentationInitializer.AllowAPIDocumentation(app);

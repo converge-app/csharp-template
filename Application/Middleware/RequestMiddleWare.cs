@@ -14,8 +14,8 @@ namespace Application
 
         public RequestMiddleware(RequestDelegate next, ILoggerFactory loggerFactory)
         {
-            this._next = next;
-            this._logger = loggerFactory.CreateLogger<RequestMiddleware>();
+            _next = next;
+            _logger = loggerFactory.CreateLogger<RequestMiddleware>();
         }
 
         public async Task Invoke(HttpContext httpContext)
@@ -23,10 +23,11 @@ namespace Application
             var path = httpContext.Request.Path.Value;
             var method = httpContext.Request.Method;
 
-            var counter = Metrics.CreateCounter("prometheus_request_total", "Http Requests Total", new CounterConfiguration()
-            {
-                LabelNames = new string[] { "path", "method", "status" }
-            });
+            var counter = Metrics.CreateCounter("prometheus_request_total", "Http Requests Total",
+                new CounterConfiguration()
+                {
+                    LabelNames = new string[] {"path", "method", "status"}
+                });
 
             var statusCode = 200;
 
@@ -47,7 +48,6 @@ namespace Application
                 statusCode = httpContext.Response.StatusCode;
                 counter.Labels(path, method, statusCode.ToString()).Inc();
             }
-
         }
     }
 

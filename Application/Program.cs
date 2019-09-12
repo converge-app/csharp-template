@@ -14,11 +14,9 @@ namespace Application
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args)
         {
-
             var assemblyName = typeof(Startup).GetTypeInfo().Assembly.FullName;
-
             return WebHost.CreateDefaultBuilder(args)
-                .UseUrls("http://0.0.0.0:80")
+                .UseUrls("http://0.0.0.0:5080")
                 .ConfigureLogging((hostingContext, logging) =>
                 {
                     logging.AddConfiguration(hostingContext.Configuration.GetSection("Logging"));
